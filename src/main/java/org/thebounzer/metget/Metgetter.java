@@ -38,16 +38,16 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class Metgetter 
 {
-    final String tmpDir = System.getProperty("java.io.tmpdir");
-    final String separator = System.getProperty("file.separator");
-    final String ftpHost = "tgftp.nws.noaa.gov";
-    final String ftpUser = "anonymous";
-    final String ftpPassword = "anonymous";
-    final String ftpPath = "data/observations/metar/decoded/";
-    final String ftpTempName = "out";
-    final String noResultFound = "<h3 align=\"center\">Sorry-No Results Found</h1><br/>";
+    private final String tmpDir = System.getProperty("java.io.tmpdir");
+    private final String separator = System.getProperty("file.separator");
+    private final String ftpHost = "tgftp.nws.noaa.gov";
+    private final String ftpUser = "anonymous";
+    private final String ftpPassword = "anonymous";
+    private final String ftpPath = "data/observations/metar/decoded/";
+    private final String ftpTempName = "out";
+    private final String noResultFound = "<h3 align=\"center\">Sorry-No Results Found</h1><br/>";
 
-    private class airport
+    public class airport
     {
         private String name;
         private String country;
@@ -144,7 +144,7 @@ public class Metgetter
         }
     }
     
-    private ArrayList<airport> airportsBuilder(String airportname) throws URISyntaxException, IOException{;
+    public ArrayList<airport> airportsBuilder(String airportname) throws URISyntaxException, IOException{;
         String postParams = "airport="+airportname.replace(" ", "+")+"&but1=submit";
         URI uri = URIUtils.createURI("http", "www.airlinecodes.co.uk", -1, "/aptcoderes.asp", postParams, null);
         ArrayList<String> tables = new ArrayList<String>();
