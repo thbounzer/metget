@@ -1,5 +1,21 @@
-package org.thebounzer.metget;
+/**
+ * Copyright 2012 Carlo Iannaccone
 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License
+ *
+ */
+
+package org.thebounzer.metget;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,6 +38,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class Metgetter 
 {
+    final String tmpDir = System.getProperty("java.io.tmpdir");
+    final String separator = System.getProperty("file.separator");
+    final String ftpHost = "tgftp.nws.noaa.gov";
+    final String ftpUser = "anonymous";
+    final String ftpPassword = "anonymous";
+    final String ftpPath = "data/observations/metar/decoded/";
+    final String ftpTempName = "out";
+    final String noResultFound = "<h3 align=\"center\">Sorry-No Results Found</h1><br/>";
 
     private class airport
     {
@@ -83,10 +107,10 @@ public class Metgetter
         public String getMetar() throws SocketException, IOException{
             if ( !(icaoCode.contains("&nbsp")) || !(icaoCode.isEmpty()) || !(icaoCode != null)){
                 FTPClient client = new FTPClient();
-                client.connect("tgftp.nws.noaa.gov");
-                client.login("anonymous", "anonymous");
-                client.changeWorkingDirectory("data/observations/metar/decoded/");
-                File out = new File("/tmp/out");
+                client.connect(ftpHost);
+                client.login(ftpUser, ftpPassword);
+                client.changeWorkingDirectory(ftpPath);
+                File out = new File(tmpDir+separator+ftpTempName);
                 out.createNewFile();
                 OutputStream output = new FileOutputStream(out);
                 client.retrieveFile(icaoCode+".TXT", output);
@@ -99,6 +123,7 @@ public class Metgetter
                     System.out.println(input);
                     metar = metar+input;
                 }
+                out.delete();
                 return metar;
             }else{
                 return "No valid ICAO code!";
@@ -133,7 +158,7 @@ public class Metgetter
         String input;
         while((input = buffered.readLine())!= null){
             tables.addAll(HTMLSimpleParser("<table ", "</table>", input));
-            if (input.contains("<h3 align=\"center\">Sorry-No Results Found</h1><br/>")) {
+            if (input.contains(noResultFound)) {
                 throw new IOException("Airport "+airportname+" not found!");
             }
         }
